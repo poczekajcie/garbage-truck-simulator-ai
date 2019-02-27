@@ -1,4 +1,4 @@
-# garbage-truck-simulator-ai
+# Symulator Śmieciarki
 Projekt na przedmiot **Sztuczna Inteligencja**
 
 ### Członkowie projektu
@@ -7,4 +7,4 @@ Projekt na przedmiot **Sztuczna Inteligencja**
   - Michał Romaszkin
   - Jakub Kwiatkowski
   
-  2019 &reg; all rights reserved
+  2019&reg; All rights reserved
