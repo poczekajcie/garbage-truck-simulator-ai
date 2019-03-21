@@ -1,4 +1,7 @@
-from Simulation import Simulation
+import importlib
+
+Simulation = 'Simulation'
+importlib.import_module(Simulation)
 
 simulation = Simulation(10, 12)
 

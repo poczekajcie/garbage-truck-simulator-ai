@@ -1,4 +1,5 @@
 from tkinter import *
+
 class MapElement(object):
 
     def __init__(self, x, y):
@@ -7,5 +8,6 @@ class MapElement(object):
 
     def action(self):
         pass
-
-    def display(self):
+    
+    def isPassable(self):
+        return False
