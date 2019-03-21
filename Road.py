@@ -1,12 +1,11 @@
 from tkinter import *
+
 from MapElement import MapElement
 
-class Bin(MapElement):
+class Road(MapElement):
     def __init__(self, x, y):
         self.position = [x,y]
-        self.image = PhotoImage(file='house.png')
-        #problem z pobraniem zdjecia z folderu
-        self.state = 'full'
+        self.image = PhotoImage(file='road.png')
 
     def action(self):
         pass
