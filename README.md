@@ -6,5 +6,6 @@ Projekt na przedmiot **Sztuczna Inteligencja**
   - Jacek Krakowski
   - Michał Romaszkin
   - Jakub Kwiatkowski
+  - Aleksander Chandrykowski
   
   2019&reg; All rights reserved
