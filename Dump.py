@@ -6,13 +6,13 @@ class Dump(MapElement):
         self.position = [x,y]
         self.type = type 
         if type == 'paper':
-            self.image = PhotoImage(file='paper.png')
+            self.image = PhotoImage(file='Images/paper.png')
         elif type == 'plastic':
-            self.image = PhotoImage(file='plastic.png')
+            self.image = PhotoImage(file='Images/plastic.png')
         elif type == 'glass':
-            self.image = PhotoImage(file='glass.png')
+            self.image = PhotoImage(file='Images/glass.png')
         else:
-            self.image = PhotoImage(file='other.png')
+            self.image = PhotoImage(file='Images/other.png')
 
     def action(self):
         pass

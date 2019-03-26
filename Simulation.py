@@ -32,7 +32,7 @@ class Simulation(object):
         self.window.title("Simulation")
         self.collector = Collector(1, 1, 2)
         self.mapElements = []
-        self.grassImage = PhotoImage(file='grass.png')
+        self.grassImage = PhotoImage(file='Images/grass.png')
         self.addDumps()
         self.addRoads()
         self.addBins()
