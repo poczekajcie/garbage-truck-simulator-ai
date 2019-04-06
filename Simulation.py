@@ -32,12 +32,19 @@ class Simulation(object):
         self.window.title("Simulation")
         self.collector = Collector(1, 1, 2)
         self.mapElements = []
+        self.grid = []
+        self.makeGrid()
         self.grassImage = PhotoImage(file='Images/grass.png')
         self.addDumps()
         self.addRoads()
         self.addBins()
         self.addGrass()
         self.collector.position = [1,1]
+
+
+    def makeGrid(self):
+        for i in range(self.gridHeight):
+            self.grid.append([0] * self.gridWidth)
     
     
     def addDumps(self):
@@ -45,8 +52,10 @@ class Simulation(object):
         n = 0
         for j in types:
             new = Dump(n, 0, j)
+            self.grid[0][n] = new
             n = n + 1 
             self.mapElements.append(new)
+
     
     def addRoad(self, position1, position2):
         if position1[0]==position2[0]:
@@ -54,11 +63,13 @@ class Simulation(object):
                 if self.checkIfPositionIsEmpty([position1[0], i]):
                     element = Road(position1[0], i)
                     self.mapElements.append(element)
+                    self.grid[i][position1[0]] = element
         elif position1[1]==position2[1]:
-            for i in range(position1[0], position2[0]+1):
+            for i in range(position1[0], position2[0]):
                 if self.checkIfPositionIsEmpty([i, position1[1]]):
                     element = Road(i, position1[1])
                     self.mapElements.append(element)
+                    self.grid[position1[1]][i] = element
 
     def addRoads(self):
         self.addRoad([0,1],[self.gridWidth,1])
@@ -78,7 +89,8 @@ class Simulation(object):
                 if self.checkIfPositionIsEmpty([x,y]):
                     rightPosition = True
             element = Bin(x, y)
-            self.mapElements.append(element) 
+            self.mapElements.append(element)
+            self.grid[y][x] = element
 
     def addGrass(self):
         for i in range (0, self.gridWidth):
@@ -86,6 +98,7 @@ class Simulation(object):
                 if self.checkIfPositionIsEmpty([i,j]):
                     element = Grass(i,j)
                     self.mapElements.append(element)
+                    self.grid[j][i] = element
 
     def display(self):
         for i in self.mapElements:
