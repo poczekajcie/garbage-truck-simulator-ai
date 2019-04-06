@@ -8,6 +8,8 @@ from Dump import Dump
 from Bin import Bin
 from State import State
 import time
+import sys
+sys.setrecursionlimit(3000)
 
 class Simulation(object):
 
@@ -40,6 +42,9 @@ class Simulation(object):
         self.addBins()
         self.addGrass()
         self.collector.position = [1,1]
+        self.results = []
+        self.dfs(self.grid, [], self.collector.position)
+        self.getBestWay(self.results)
 
 
     def makeGrid(self):
@@ -124,3 +129,71 @@ class Simulation(object):
     def moveCollector(self):
         self.update()
         self.collector.turnLeft()
+
+    def DoPossibleMove(self, direction):
+        return direction
+
+##################################################################### DFS
+
+    def dfs(self, grid, listOfSteps, collectorPosition):
+        if self.isTheEnd(grid):
+            self.results.append(listOfSteps)
+        else:
+            for possibility in self.findPossibilities(grid, collectorPosition):
+                collectorPosition = self.DoPossibleMove(possibility)
+                grid = self.emptyHouseIfIsFull(grid, collectorPosition)
+                listOfSteps.append(possibility)
+                return self.dfs(grid, listOfSteps, collectorPosition)
+
+    def isTheEnd(self, grid):
+        for i in range(0, self.gridHeight):
+            for object in grid[i]:
+                if isinstance(object, Bin):
+                    if object.state == 'full':
+                        return False
+        return True
+
+    def findPossibilities(self, grid, collectorPosition):
+        possibleMoves = []
+        #left
+        if (collectorPosition[0]-1 >= 0) and (isinstance(grid[collectorPosition[1]][collectorPosition[0]-1], Road)):
+            possibleMoves.append([collectorPosition[0]-1, collectorPosition[1]])
+        #right
+        if (collectorPosition[0] + 1 < self.gridWidth) and (isinstance(grid[collectorPosition[1]][collectorPosition[0] + 1], Road)):
+            possibleMoves.append([collectorPosition[0] + 1, collectorPosition[1]])
+        #up
+        if (collectorPosition[1] - 1 >= 0) and (isinstance(grid[collectorPosition[1] - 1][collectorPosition[0]], Road)):
+            possibleMoves.append([collectorPosition[0], collectorPosition[1] - 1])
+        #down
+        if (collectorPosition[1] + 1 < self.gridHeight) and (isinstance(grid[collectorPosition[1] + 1][collectorPosition[0]], Road)):
+            possibleMoves.append([collectorPosition[0], collectorPosition[1] + 1])
+        return possibleMoves
+
+    def emptyHouseIfIsFull(self, grid, collectorPosition):
+
+        # left
+        if (collectorPosition[0] - 1 >= 0) and (isinstance(grid[collectorPosition[1]][collectorPosition[0] - 1], Bin)):
+            if grid[collectorPosition[1]][collectorPosition[0] - 1].state == 'full':
+                grid[collectorPosition[1]][collectorPosition[0] - 1].state = 'empty'
+
+        # right
+        if (collectorPosition[0] + 1 < self.gridWidth) and (isinstance(grid[collectorPosition[1]][collectorPosition[0] + 1], Bin)):
+            if grid[collectorPosition[1]][collectorPosition[0] + 1].state == 'full':
+                grid[collectorPosition[1]][collectorPosition[0] + 1].state = 'empty'
+
+        # up
+        if (collectorPosition[1] - 1 >= 0) and (isinstance(grid[collectorPosition[1] - 1][collectorPosition[0]], Bin)):
+            if grid[collectorPosition[1] - 1][collectorPosition[0]].state == 'full':
+                grid[collectorPosition[1] - 1][collectorPosition[0]].state = 'empty'
+
+        # down
+        if (collectorPosition[1] + 1 < self.gridHeight) and (isinstance(grid[collectorPosition[1] + 1][collectorPosition[0]], Bin)):
+            if grid[collectorPosition[1] + 1][collectorPosition[0]].state == 'full':
+                grid[collectorPosition[1] + 1][collectorPosition[0]].state = 'empty'
+
+        return grid
+
+
+    def getBestWay(self, results):
+        print("no beda xd")
+
