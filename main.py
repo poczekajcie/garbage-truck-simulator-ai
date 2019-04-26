@@ -5,4 +5,4 @@ simulation = Simulation(20)
 
 print('Opening simulation window...')
 
-simulation.start() 
+simulation.start()

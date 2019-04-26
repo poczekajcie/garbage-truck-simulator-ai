@@ -1,3 +1,4 @@
+import collections
 from tkinter import *
 from random import randint
 from Collector import Collector
@@ -41,10 +42,8 @@ class Simulation(object):
         self.addRoads()
         self.addBins()
         self.addGrass()
-        self.collector.position = [1,1]
         self.results = []
-        self.dfs(self.grid, [], self.collector.position)
-        self.getBestWay(self.results)
+        self.bfs_wrapper(self.grid, self.collector.state.position)
 
 
     def makeGrid(self):
@@ -119,7 +118,7 @@ class Simulation(object):
         self.display()
         self.window.update_idletasks()
         self.window.update()
-        time.sleep(1.5)
+        time.sleep(0.2)
     
     def start(self):
         while True:
@@ -128,72 +127,82 @@ class Simulation(object):
 ##################################################################### RUCH AGENTA 
     def moveCollector(self):
         self.update()
-        self.collector.turnLeft()
+        while self.results:
+            path = self.results.pop(0)
+            step = path.pop(0)
+            while True:
+                # print(self.collector.state.position, step, path)
+                if self.collector.state.position == step:
+                    if path:
+                        step = path.pop(0)
+                else:
+                    if self.collector.state.rotation == self.cords_to_rotation(self.collector.state.position, step):
+                        self.collector.goAhead()
+                    elif (self.collector.state.rotation - self.cords_to_rotation(self.collector.state.position, step)) % 4 == 1:
+                        self.collector.turnLeft()
+                    elif (self.collector.state.rotation - self.cords_to_rotation(self.collector.state.position, step)) % 4 == 3:
+                        self.collector.turnRight()
+                    elif (self.collector.state.rotation - self.cords_to_rotation(self.collector.state.position, step)) % 4 == 2:
+                        self.collector.turnRight()
+                        self.collector.turnRight()
+                    self.update()
+                    if not path:
+                        break
+            self.empty_bin(step)
+            self.update()
 
     def DoPossibleMove(self, direction):
         return direction
 
 ##################################################################### DFS
-
-    def dfs(self, grid, listOfSteps, collectorPosition):
-        if self.isTheEnd(grid):
-            self.results.append(listOfSteps)
-        else:
-            for possibility in self.findPossibilities(grid, collectorPosition):
-                collectorPosition = self.DoPossibleMove(possibility)
-                grid = self.emptyHouseIfIsFull(grid, collectorPosition)
-                listOfSteps.append(possibility)
-                return self.dfs(grid, listOfSteps, collectorPosition)
-
-    def isTheEnd(self, grid):
-        for i in range(0, self.gridHeight):
-            for object in grid[i]:
-                if isinstance(object, Bin):
-                    if object.state == 'full':
-                        return False
-        return True
-
-    def findPossibilities(self, grid, collectorPosition):
-        possibleMoves = []
-        #left
-        if (collectorPosition[0]-1 >= 0) and (isinstance(grid[collectorPosition[1]][collectorPosition[0]-1], Road)):
-            possibleMoves.append([collectorPosition[0]-1, collectorPosition[1]])
-        #right
-        if (collectorPosition[0] + 1 < self.gridWidth) and (isinstance(grid[collectorPosition[1]][collectorPosition[0] + 1], Road)):
-            possibleMoves.append([collectorPosition[0] + 1, collectorPosition[1]])
-        #up
-        if (collectorPosition[1] - 1 >= 0) and (isinstance(grid[collectorPosition[1] - 1][collectorPosition[0]], Road)):
-            possibleMoves.append([collectorPosition[0], collectorPosition[1] - 1])
-        #down
-        if (collectorPosition[1] + 1 < self.gridHeight) and (isinstance(grid[collectorPosition[1] + 1][collectorPosition[0]], Road)):
-            possibleMoves.append([collectorPosition[0], collectorPosition[1] + 1])
-        return possibleMoves
-
-    def emptyHouseIfIsFull(self, grid, collectorPosition):
-
-        # left
-        if (collectorPosition[0] - 1 >= 0) and (isinstance(grid[collectorPosition[1]][collectorPosition[0] - 1], Bin)):
-            if grid[collectorPosition[1]][collectorPosition[0] - 1].state == 'full':
-                grid[collectorPosition[1]][collectorPosition[0] - 1].state = 'empty'
-
-        # right
-        if (collectorPosition[0] + 1 < self.gridWidth) and (isinstance(grid[collectorPosition[1]][collectorPosition[0] + 1], Bin)):
-            if grid[collectorPosition[1]][collectorPosition[0] + 1].state == 'full':
-                grid[collectorPosition[1]][collectorPosition[0] + 1].state = 'empty'
-
-        # up
-        if (collectorPosition[1] - 1 >= 0) and (isinstance(grid[collectorPosition[1] - 1][collectorPosition[0]], Bin)):
-            if grid[collectorPosition[1] - 1][collectorPosition[0]].state == 'full':
-                grid[collectorPosition[1] - 1][collectorPosition[0]].state = 'empty'
-
-        # down
-        if (collectorPosition[1] + 1 < self.gridHeight) and (isinstance(grid[collectorPosition[1] + 1][collectorPosition[0]], Bin)):
-            if grid[collectorPosition[1] + 1][collectorPosition[0]].state == 'full':
-                grid[collectorPosition[1] + 1][collectorPosition[0]].state = 'empty'
-
+    def mark_as_visited(self, grid, pos):
+        for x, y in ((pos[0]+1, pos[1]), (pos[0]-1, pos[1]), (pos[0], pos[1]+1), (pos[0], pos[1]-1)):
+            if 0 <= x < self.gridWidth and 0 <= y < self.gridHeight and isinstance(grid[y][x], Bin):
+                grid[y][x].visited = True
         return grid
 
+    def empty_bin(self, pos):
+        for x, y in ((pos[0]+1, pos[1]), (pos[0]-1, pos[1]), (pos[0], pos[1]+1), (pos[0], pos[1]-1)):
+            if 0 <= x < self.gridWidth and 0 <= y < self.gridHeight and isinstance(self.grid[y][x], Bin):
+                self.grid[y][x].empty()
 
-    def getBestWay(self, results):
-        print("no beda xd")
+    def end_conditions(self, grid):
+        for i in range(0, self.gridHeight):
+            for obj in grid[i]:
+                if isinstance(obj, Bin):
+                    if not obj.visited: return False
+        return True
 
+    def bfs_wrapper(self, grid, pos):
+        while True:
+            self.results.append(self.bfs(grid, pos))
+            pos = self.results[-1][-1]
+            grid = self.mark_as_visited(grid, pos)
+            if self.end_conditions(grid):
+                break
+
+    def bfs(self, grid, start):
+        queue = collections.deque([[start]])
+        seen = [[start]]
+        while queue:
+            path = queue.popleft()
+            x, y = path[-1]
+            if self.break_conditions(grid, [x, y]):
+                return path
+            for x2, y2 in ((x+1, y), (x-1, y), (x, y-1), (x, y+1)):
+                if 0 <= x2 < self.gridWidth and 0 <= y2 < self.gridHeight and isinstance(grid[y2][x2], Road) and (x2, y2) not in seen:
+                    queue.append(path + [[x2, y2]])
+                    seen.append((x2, y2))
+
+    def break_conditions(self, grid, pos):
+        for x, y in ((pos[0]+1, pos[1]), (pos[0]-1, pos[1]), (pos[0], pos[1]+1), (pos[0], pos[1]-1)):
+            if 0 <= x < self.gridWidth and 0 <= y < self.gridHeight and isinstance(grid[y][x], Bin):
+                if not grid[y][x].visited: return True
+        return False
+
+    def cords_to_rotation(self, collector_position, next_step):
+        rotation = collector_position[0]-next_step[0], collector_position[1]-next_step[1]
+        if rotation == (1, 0): return 3
+        if rotation == (0, 1): return 0
+        if rotation == (-1, 0): return 1
+        if rotation == (0, -1): return 2
