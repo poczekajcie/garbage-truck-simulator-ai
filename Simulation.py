@@ -43,7 +43,7 @@ class Simulation(object):
         self.addBins()
         self.addGrass()
         self.results = []
-        self.bfs_wrapper(self.grid, self.collector.state.position)
+        self.dfs_wrapper(self.grid, self.collector.state.position)
 
 
     def makeGrid(self):
@@ -192,6 +192,27 @@ class Simulation(object):
             for x2, y2 in ((x+1, y), (x-1, y), (x, y-1), (x, y+1)):
                 if 0 <= x2 < self.gridWidth and 0 <= y2 < self.gridHeight and isinstance(grid[y2][x2], Road) and (x2, y2) not in seen:
                     queue.append(path + [[x2, y2]])
+                    seen.append((x2, y2))
+
+    def dfs_wrapper(self, grid, pos):
+        while True:
+            self.results.append(self.dfs(grid, pos))
+            pos = self.results[-1][-1]
+            grid = self.mark_as_visited(grid, pos)
+            if self.end_conditions(grid):
+                break
+
+    def dfs(self, grid, start):
+        stack = collections.deque([[start]])
+        seen = [[start]]
+        while stack:
+            path = stack.pop()
+            x, y = path[-1]
+            if self.break_conditions(grid, [x, y]):
+                return path
+            for x2, y2 in ((x+1, y), (x-1, y), (x, y-1), (x, y+1)):
+                if 0 <= x2 < self.gridWidth and 0 <= y2 < self.gridHeight and isinstance(grid[y2][x2], Road) and (x2, y2) not in seen:
+                    stack.append(path + [[x2, y2]])
                     seen.append((x2, y2))
 
     def break_conditions(self, grid, pos):
