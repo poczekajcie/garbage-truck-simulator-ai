@@ -44,7 +44,7 @@ class Simulation(object):
         self.addGrass()
         self.results = []
         self.dfs_wrapper(self.grid, self.collector.state.position)
-
+        #self.bfs_wrapper(self.grid, self.collector.state.position)
 
     def makeGrid(self):
         for i in range(self.gridHeight):
