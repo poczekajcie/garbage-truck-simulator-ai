@@ -1,3 +1,4 @@
+#import PredictDigits
 import collections
 from tkinter import *
 from random import randint
@@ -149,6 +150,7 @@ class Simulation(object):
                     if not path:
                         break
             self.empty_bin(step)
+            #PredictDigits.predictDigits()
             self.update()
 
     def DoPossibleMove(self, direction):
