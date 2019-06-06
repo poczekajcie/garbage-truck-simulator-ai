@@ -42,9 +42,29 @@ class Simulation(object):
         self.addRoads()
         self.addBins()
         self.addGrass()
+        self.vowpalGrid = []
+        self.makeGridForVowpal()
         self.results = []
-        self.dfs_wrapper(self.grid, self.collector.state.position)
+        self.bfs_wrapper(self.grid, self.collector.state.position)
+        self.getDataForVowpal()
 
+
+    def makeGridForVowpal(self):
+        for i in range(self.gridHeight):
+            self.vowpalGrid.append([0] * self.gridWidth)
+        for i in range(self.gridHeight):
+            for j in range(self.gridWidth):
+                if isinstance(self.grid[i][j], Road):
+                    self.vowpalGrid[i][j] = 0
+                elif isinstance(self.grid[i][j], Road) and (
+                        isinstance(self.grid[i + 1][j], Bin) or
+                        isinstance(self.grid[i - 1][j], Bin) or
+                        isinstance(self.grid[i][j + 1], Bin) or
+                        isinstance(self.grid[i][j - 1], Bin)
+                ):
+                    self.vowpalGrid[i][j] = 2
+                else:
+                    self.vowpalGrid[i][j] = 1
 
     def makeGrid(self):
         for i in range(self.gridHeight):
@@ -118,7 +138,7 @@ class Simulation(object):
         self.display()
         self.window.update_idletasks()
         self.window.update()
-        time.sleep(0.2)
+        time.sleep(0.5)
     
     def start(self):
         while True:
@@ -227,3 +247,27 @@ class Simulation(object):
         if rotation == (0, 1): return 0
         if rotation == (-1, 0): return 1
         if rotation == (0, -1): return 2
+
+##################### VOWPAL
+
+    def getDataForVowpal(self):
+        path = []
+        for i in range(len(self.results)):
+            for j in range(len(self.results[i])):
+                path.append(self.results[i][j])
+        for i in range(len(path)):
+            string = ""
+            string = string + str(self.vowpalGrid[path[i][0]][path[i][1]]) + " | "
+            string = string + str(self.vowpalGrid[path[i][0] + 1][path[i][1] - 1]) + " "
+            string = string + str(self.vowpalGrid[path[i][0] + 1][path[i][1]]) + " "
+            string = string + str(self.vowpalGrid[path[i][0] + 1][path[i][1] + 1]) + " "
+            string = string + str(self.vowpalGrid[path[i][0]][path[i][1] - 1]) + " "
+            string = string + str(self.vowpalGrid[path[i][0]][path[i][1] + 1]) + " "
+            string = string + str(self.vowpalGrid[path[i][0] - 1][path[i][1] - 1]) + " "
+            string = string + str(self.vowpalGrid[path[i][0] - 1][path[i][1]]) + " "
+            string = string + str(self.vowpalGrid[path[i][0] - 1][path[i][1] + 1])
+
+            print(string)
+        print("koniec")
+
+
