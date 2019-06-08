@@ -34,6 +34,9 @@ A także plik z zawartością logiki do symulacji o nazwie _Simulation.py_
 ### Images
 Tu znajdują się wszystkie potrzebne grafiki, które generowane są na mapie (domki, śmietniki, trawa, droga).
 
+### Data
+Nic innego jak potrzebne dane do uczenia maszynowego, jak np. pozycje śmieciarki z wygenerowania klikudziesięciu map.
+
 ### Documentation
 Plik zawierający dokumentację projektu.
   
