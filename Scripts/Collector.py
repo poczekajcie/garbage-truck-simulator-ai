@@ -5,7 +5,7 @@ from State import State
 class Collector(MapElement):
 
     def __init__(self, x, y, rotation):
-        self.image = PhotoImage(file='Images/collector2.png')
+        self.image = PhotoImage(file='../Images/collector2.png')
         self.maxCapacity = 10
         self.paperAmount = 0
         self.glassAmount = 0
@@ -15,7 +15,7 @@ class Collector(MapElement):
         self.states = []
 
     def updateImage(self):
-        self.newImgName = "Images/collector" + str(self.state.rotation) + ".png"
+        self.newImgName = "../Images/collector" + str(self.state.rotation) + ".png"
         self.image = PhotoImage(file=self.newImgName)
 
     def turnLeft(self):

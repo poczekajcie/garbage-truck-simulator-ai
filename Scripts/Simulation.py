@@ -37,7 +37,7 @@ class Simulation(object):
         self.mapElements = []
         self.grid = []
         self.makeGrid()
-        self.grassImage = PhotoImage(file='Images/grass.png')
+        self.grassImage = PhotoImage(file='../Images/grass.png')
         self.addDumps()
         self.addRoads()
         self.addBins()
@@ -133,7 +133,7 @@ class Simulation(object):
         self.display()
         self.window.update_idletasks()
         self.window.update()
-        time.sleep(0.5)
+        time.sleep(0.1)
     
     def start(self):
         while True:
@@ -146,7 +146,7 @@ class Simulation(object):
             path = self.results.pop(0)
             step = path.pop(0)
             while True:
-                # print(self.collector.state.position, step, path)
+                #print(self.collector.state.position, step, path)
                 if self.collector.state.position == step:
                     if path:
                         step = path.pop(0)
@@ -246,7 +246,7 @@ class Simulation(object):
 ##################### VOWPAL
 
     def getDataForVowpal(self):
-        f = open("vowpal-data.txt", "w+")
+        f = open("vowpal-data.txt", "a+")
         path = []
         for i in range(len(self.results)):
             for j in range(len(self.results[i])):
@@ -262,7 +262,7 @@ class Simulation(object):
             string = string + str(self.vowpalGrid[path[i][1]+1 - 1][path[i][0]+1 - 1]) + " "
             string = string + str(self.vowpalGrid[path[i][1]+1 - 1][path[i][0]+1]) + " "
             string = string + str(self.vowpalGrid[path[i][1]+1 - 1][path[i][0]+1 + 1])
-            f.write(string + "\n")
+            #f.write(string + "\n")
         f.close()
 
 
