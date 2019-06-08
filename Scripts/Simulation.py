@@ -1,4 +1,6 @@
 import collections
+import time
+import sys
 from tkinter import *
 from random import randint
 from Collector import Collector
@@ -8,8 +10,8 @@ from Grass import Grass
 from Dump import Dump
 from Bin import Bin
 from State import State
-import time
-import sys
+from os import path
+
 sys.setrecursionlimit(3000)
 
 class Simulation(object):
@@ -46,7 +48,8 @@ class Simulation(object):
         self.makeGridForVowpal()
         self.results = []
         self.bfs_wrapper(self.grid, self.collector.state.position)
-        self.getDataForVowpal()
+        self.get_data_for_vowpal()
+        self.rabbit_training()
 
 
     def makeGridForVowpal(self):
@@ -245,8 +248,8 @@ class Simulation(object):
 
 ##################### VOWPAL
 
-    def getDataForVowpal(self):
-        f = open("vowpal-data.txt", "a+")
+    def get_data_for_vowpal(self):
+        f = open("../data/vowpal-data.txt", "a+")
         path = []
         for i in range(len(self.results)):
             for j in range(len(self.results[i])):
@@ -265,4 +268,12 @@ class Simulation(object):
             #f.write(string + "\n")
         f.close()
 
+    def wabbit_init(self):
+        self.input  = path.join('.', 'data', 'vowpal-data.txt')
+        self.output = path.join('.', 'data', 'vowpal-output.txt')
+        self.model  = path.join('.', 'data', 'vowpal.model')
+        
+    def rabbit_training(self):
+        return 'vw {} -c --passes 25 -f {}'.format(path.join('.', 'data', 'vowpal-data.txt'),path.join('.', 'data', 'vowpal.model'))
 
+      
