@@ -38,7 +38,7 @@ class Simulation(object):
         self.mapElements = []
         self.grid = []
         self.makeGrid()
-        self.grassImage = PhotoImage(file='Images/grass.png')
+        self.grassImage = PhotoImage(file='../Images/grass.png')
         self.addDumps()
         self.addRoads()
         self.addBins()
