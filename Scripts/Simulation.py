@@ -58,11 +58,11 @@ class Simulation(object):
         for i in range(self.gridHeight):
             for j in range(self.gridWidth):
                 if isinstance(self.grid[i][j], Road):
-                    self.vowpalGrid[i+1][j+1] = 0
+                    self.vowpalGrid[i+1][j+1] = 5
                 elif isinstance(self.grid[i][j], Bin):
-                    self.vowpalGrid[i+1][j+1] = 2
+                    self.vowpalGrid[i+1][j+1] = 6
                 else:
-                    self.vowpalGrid[i+1][j+1] = 1
+                    self.vowpalGrid[i+1][j+1] = 7
 
     def makeGrid(self):
         for i in range(self.gridHeight):
@@ -242,9 +242,10 @@ class Simulation(object):
     def cords_to_rotation(self, collector_position, next_step):
         rotation = collector_position[0]-next_step[0], collector_position[1]-next_step[1]
         if rotation == (1, 0): return 3
-        if rotation == (0, 1): return 0
-        if rotation == (-1, 0): return 1
-        if rotation == (0, -1): return 2
+        elif rotation == (0, 1): return 0
+        elif rotation == (-1, 0): return 1
+        elif rotation == (0, -1): return 2
+        else: return 4
 
 ##################### VOWPAL
 
@@ -254,9 +255,10 @@ class Simulation(object):
         for i in range(len(self.results)):
             for j in range(len(self.results[i])):
                 path.append(self.results[i][j])
-        for i in range(len(path)):
+        for i in range(len(path)-1):
             string = ""
-            string = string + str(self.vowpalGrid[path[i][1]+1][path[i][0]+1]) + " | "
+            string = string + str(self.cords_to_rotation(path[i], path[i+1])) + " | "
+            #string = string + str(self.vowpalGrid[path[i][1]+1][path[i][0]+1]) + " | "
             string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1 - 1]) + " "
             string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1]) + " "
             string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1 + 1]) + " "
@@ -266,6 +268,7 @@ class Simulation(object):
             string = string + str(self.vowpalGrid[path[i][1]+1 - 1][path[i][0]+1]) + " "
             string = string + str(self.vowpalGrid[path[i][1]+1 - 1][path[i][0]+1 + 1])
             #f.write(string + "\n")
+            print(string)
         f.close()
 
     def wabbit_init(self):
