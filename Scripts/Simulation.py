@@ -249,7 +249,7 @@ class Simulation(object):
 ##################### VOWPAL
 
     def get_data_for_vowpal(self):
-        f = open("../data/vowpal-data.txt", "a+")
+        f = open("../Data/vowpal-data.txt", "a+")
         path = []
         for i in range(len(self.results)):
             for j in range(len(self.results[i])):
