@@ -10,7 +10,7 @@ from Grass import Grass
 from Dump import Dump
 from Bin import Bin
 from State import State
-from os import path
+from os import path, system
 
 sys.setrecursionlimit(3000)
 
@@ -50,7 +50,7 @@ class Simulation(object):
         self.bfs_wrapper(self.grid, self.collector.state.position)
         self.get_data_for_vowpal()
         self.rabbit_training()
-
+        self.rabbit_learn()
 
     def makeGridForVowpal(self):
         for i in range(self.gridHeight+2):
@@ -58,11 +58,11 @@ class Simulation(object):
         for i in range(self.gridHeight):
             for j in range(self.gridWidth):
                 if isinstance(self.grid[i][j], Road):
-                    self.vowpalGrid[i+1][j+1] = 0
+                    self.vowpalGrid[i+1][j+1] = 5
                 elif isinstance(self.grid[i][j], Bin):
-                    self.vowpalGrid[i+1][j+1] = 2
+                    self.vowpalGrid[i+1][j+1] = 6
                 else:
-                    self.vowpalGrid[i+1][j+1] = 1
+                    self.vowpalGrid[i+1][j+1] = 7
 
     def makeGrid(self):
         for i in range(self.gridHeight):
@@ -241,10 +241,11 @@ class Simulation(object):
 
     def cords_to_rotation(self, collector_position, next_step):
         rotation = collector_position[0]-next_step[0], collector_position[1]-next_step[1]
-        if rotation == (1, 0): return 3
-        if rotation == (0, 1): return 0
-        if rotation == (-1, 0): return 1
-        if rotation == (0, -1): return 2
+        if rotation == (1, 0): return 3    #prawo
+        elif rotation == (0, 1): return 0  #góra
+        elif rotation == (-1, 0): return 1 #lewo
+        elif rotation == (0, -1): return 2 #dół
+        else: return 4                     #brak ruchu
 
 ##################### VOWPAL
 
@@ -254,9 +255,9 @@ class Simulation(object):
         for i in range(len(self.results)):
             for j in range(len(self.results[i])):
                 path.append(self.results[i][j])
-        for i in range(len(path)):
+        for i in range(len(path)-1):
             string = ""
-            string = string + str(self.vowpalGrid[path[i][1]+1][path[i][0]+1]) + " | "
+            string = string + str(self.cords_to_rotation(path[i], path[i+1])) + " | "
             string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1 - 1]) + " "
             string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1]) + " "
             string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1 + 1]) + " "
@@ -267,13 +268,16 @@ class Simulation(object):
             string = string + str(self.vowpalGrid[path[i][1]+1 - 1][path[i][0]+1 + 1])
             #f.write(string + "\n")
         f.close()
-
-    def wabbit_init(self):
-        self.input  = path.join('.', 'data', 'vowpal-data.txt')
-        self.output = path.join('.', 'data', 'vowpal-output.txt')
-        self.model  = path.join('.', 'data', 'vowpal.model')
         
     def rabbit_training(self):
-        return 'vw {} -c --passes 25 -f {}'.format(path.join('.', 'data', 'vowpal-data.txt'),path.join('.', 'data', 'vowpal.model'))
+        system('vw {} -c --passes 20 -f {}'.format(path.join('../', 'Data', 'vowpal-data.txt'),path.join('../', 'Data', 'vowpal.model')))
+        #-c - use cache
+        #--passes 15 - number of training passes
+        #-f file to save final regressor
 
-      
+    def rabbit_learn(self):
+        system('vw -i {} -t {} -p {} --quiet '.format(path.join('../', 'Data', 'vowpal.model'), path.join('../', 'Data', 'vowpal-data.txt'), path.join('../', 'Data', 'vowpal-output.txt')))
+        #-i - model
+        #-t ignore label information and just test
+        #-p file to output predictions
+        #--quiet don't output diagnostics
