@@ -241,11 +241,19 @@ class Simulation(object):
 
     def cords_to_rotation(self, collector_position, next_step):
         rotation = collector_position[0]-next_step[0], collector_position[1]-next_step[1]
+<<<<<<< HEAD
         if rotation == (1, 0): return 3    #prawo
         elif rotation == (0, 1): return 0  #góra
         elif rotation == (-1, 0): return 1 #lewo
         elif rotation == (0, -1): return 2 #dół
         else: return 4                     #brak ruchu
+=======
+        if rotation == (1, 0): return 3
+        elif rotation == (0, 1): return 0
+        elif rotation == (-1, 0): return 1
+        elif rotation == (0, -1): return 2
+        else: return 4
+>>>>>>> d19a7bbfe459d107eb5eedb2eedcb9d29f8a5fcf
 
 ##################### VOWPAL
 
@@ -258,6 +266,10 @@ class Simulation(object):
         for i in range(len(path)-1):
             string = ""
             string = string + str(self.cords_to_rotation(path[i], path[i+1])) + " | "
+<<<<<<< HEAD
+=======
+            #string = string + str(self.vowpalGrid[path[i][1]+1][path[i][0]+1]) + " | "
+>>>>>>> d19a7bbfe459d107eb5eedb2eedcb9d29f8a5fcf
             string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1 - 1]) + " "
             string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1]) + " "
             string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1 + 1]) + " "
@@ -267,6 +279,7 @@ class Simulation(object):
             string = string + str(self.vowpalGrid[path[i][1]+1 - 1][path[i][0]+1]) + " "
             string = string + str(self.vowpalGrid[path[i][1]+1 - 1][path[i][0]+1 + 1])
             #f.write(string + "\n")
+            print(string)
         f.close()
         
     def rabbit_training(self):
