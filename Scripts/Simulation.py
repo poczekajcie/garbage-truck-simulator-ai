@@ -294,7 +294,7 @@ class Simulation(object):
         X = np.asarray(X)
         y = np.asarray(y)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
-        model = LogisticRegression()
+        model = LogisticRegression(multi_class='multinominal')
         # Trenowanie
         model.fit(X_train, y_train)
         decisions = model.predict(X_test)
