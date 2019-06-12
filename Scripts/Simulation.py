@@ -11,6 +11,10 @@ from Dump import Dump
 from Bin import Bin
 from State import State
 from os import path, system
+# Regresja Logistyczna
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+import numpy as np
 
 sys.setrecursionlimit(3000)
 
@@ -49,8 +53,8 @@ class Simulation(object):
         self.results = []
         self.bfs_wrapper(self.grid, self.collector.state.position)
         self.get_data_for_vowpal()
-        self.rabbit_training()
-        self.rabbit_learn()
+        self.getDataFromFile()
+        self.logisticRegression()
 
     def makeGridForVowpal(self):
         for i in range(self.gridHeight+2):
@@ -257,28 +261,49 @@ class Simulation(object):
                 path.append(self.results[i][j])
         for i in range(len(path)-1):
             string = ""
-            string = string + str(self.cords_to_rotation(path[i], path[i+1])) + " | "
-            string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1 - 1]) + " "
-            string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1]) + " "
-            string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1 + 1]) + " "
-            string = string + str(self.vowpalGrid[path[i][1]+1][path[i][0]+1 - 1]) + " "
-            string = string + str(self.vowpalGrid[path[i][1]+1][path[i][0]+1 + 1]) + " "
-            string = string + str(self.vowpalGrid[path[i][1]+1 - 1][path[i][0]+1 - 1]) + " "
-            string = string + str(self.vowpalGrid[path[i][1]+1 - 1][path[i][0]+1]) + " "
-            string = string + str(self.vowpalGrid[path[i][1]+1 - 1][path[i][0]+1 + 1])
-            #f.write(string + "\n")
-            print(string)
+            # Przypisanie co jest wokół agenta
+            string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1 - 1]) + ","
+            string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1]) + ","
+            string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1 + 1]) + ","
+            string = string + str(self.vowpalGrid[path[i][1]+1][path[i][0]+1 - 1]) + ","
+            string = string + str(self.vowpalGrid[path[i][1]+1][path[i][0]+1 + 1]) + ","
+            string = string + str(self.vowpalGrid[path[i][1]+1 - 1][path[i][0]+1 - 1]) + ","
+            string = string + str(self.vowpalGrid[path[i][1]+1 - 1][path[i][0]+1]) + ","
+            string = string + str(self.vowpalGrid[path[i][1]+1 - 1][path[i][0]+1 + 1]) + ","
+            # Decyzja agenta co do następnego kroku
+            string = string + str(self.cords_to_rotation(path[i], path[i + 1]))
+            f.write(string + "\n")
         f.close()
         
-    def rabbit_training(self):
-        system('vw {} -c --passes 15 -f {}'.format(path.join('../', 'Data', 'vowpal-data.txt'),path.join('../', 'Data', 'vowpal.model')))
-        #-c - use cache
-        #--passes 15 - number of training passes
-        #-f file to save final regressor
+    def getDataFromFile(self):
+        possibilities = []
+        decisions = []
+        with open("../Data/vowpal-data.txt") as data:
+            for line in data:
+                    decision = line.split(',')[-1].strip()
+                    decisions.append(decision)
+                    possibility = line.split(',')[:-1]
+                    possibilities.append(possibility)
+                    for i in range(len(possibilities)):
+                        possibilities[i] = list(map(int, possibilities[i]))
+                    decisions = list(map(int, decisions))
+        return possibilities, decisions
 
-    def rabbit_learn(self):
-        system('vw -i {} -t {} -p {} --quiet '.format(path.join('../', 'Data', 'vowpal.model'), path.join('../', 'Data', 'vowpal-data.txt'), path.join('../', 'Data', 'vowpal-output.txt')))
-        #-i - model
-        #-t ignore label information and just test
-        #-p file to output predictions
-        #--quiet don't output diagnostics
+    def logisticRegression(self):
+        X, y = self.getDataFromFile()
+        X = np.asarray(X)
+        y = np.asarray(y)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
+        model = LogisticRegression()
+        # Trenowanie
+        model.fit(X_train, y_train)
+        decisions = model.predict(X_test)
+        # Wypisanie do pliku
+        with open('../Data/logistic-data.txt', 'w') as data:
+            data.write('Przewidywany wybor | Wybor\n')
+            for (choice, decision) in zip(y, decisions):
+                data.write(str(choice) + '\t|\t' + str(decision) + '\n')
+        with open('../Data/logistic-score.txt', 'w') as data:
+            data.write('Wynik obliczen ' + str(model.score(X, y)))
+
+    
