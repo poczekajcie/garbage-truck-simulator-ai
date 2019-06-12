@@ -48,25 +48,25 @@ class Simulation(object):
         self.addRoads()
         self.addBins()
         self.addGrass()
-        self.vowpalGrid = []
-        self.makeGridForVowpal()
+        self.regressionGrid = []
+        self.makeGridForRegression()
         self.results = []
         self.bfs_wrapper(self.grid, self.collector.state.position)
-        self.get_data_for_vowpal()
+        self.getDataToFile()
         self.getDataFromFile()
         self.logisticRegression()
 
-    def makeGridForVowpal(self):
+    def makeGridForRegression(self):
         for i in range(self.gridHeight+2):
-            self.vowpalGrid.append([1] * (self.gridWidth+2))
+            self.regressionGrid.append([1] * (self.gridWidth+2))
         for i in range(self.gridHeight):
             for j in range(self.gridWidth):
                 if isinstance(self.grid[i][j], Road):
-                    self.vowpalGrid[i+1][j+1] = 5
+                    self.regressionGrid[i+1][j+1] = 5
                 elif isinstance(self.grid[i][j], Bin):
-                    self.vowpalGrid[i+1][j+1] = 6
+                    self.regressionGrid[i+1][j+1] = 6
                 else:
-                    self.vowpalGrid[i+1][j+1] = 7
+                    self.regressionGrid[i+1][j+1] = 7
 
     def makeGrid(self):
         for i in range(self.gridHeight):
@@ -251,10 +251,10 @@ class Simulation(object):
         elif rotation == (0, -1): return 2 #dół
         else: return 4                     #brak ruchu
 
-##################### VOWPAL
+##################### Regresja Logistyczna
 
-    def get_data_for_vowpal(self):
-        f = open("../Data/vowpal-data.txt", "a+")
+    def getDataToFile(self):
+        f = open("../Data/logistic-input.txt", "a+")
         path = []
         for i in range(len(self.results)):
             for j in range(len(self.results[i])):
@@ -262,14 +262,14 @@ class Simulation(object):
         for i in range(len(path)-1):
             string = ""
             # Przypisanie co jest wokół agenta
-            string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1 - 1]) + ","
-            string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1]) + ","
-            string = string + str(self.vowpalGrid[path[i][1]+1 + 1][path[i][0]+1 + 1]) + ","
-            string = string + str(self.vowpalGrid[path[i][1]+1][path[i][0]+1 - 1]) + ","
-            string = string + str(self.vowpalGrid[path[i][1]+1][path[i][0]+1 + 1]) + ","
-            string = string + str(self.vowpalGrid[path[i][1]+1 - 1][path[i][0]+1 - 1]) + ","
-            string = string + str(self.vowpalGrid[path[i][1]+1 - 1][path[i][0]+1]) + ","
-            string = string + str(self.vowpalGrid[path[i][1]+1 - 1][path[i][0]+1 + 1]) + ","
+            string = string + str(self.regressionGrid[path[i][1]+1 + 1][path[i][0]+1 - 1]) + ","
+            string = string + str(self.regressionGrid[path[i][1]+1 + 1][path[i][0]+1]) + ","
+            string = string + str(self.regressionGrid[path[i][1]+1 + 1][path[i][0]+1 + 1]) + ","
+            string = string + str(self.regressionGrid[path[i][1]+1][path[i][0]+1 - 1]) + ","
+            string = string + str(self.regressionGrid[path[i][1]+1][path[i][0]+1 + 1]) + ","
+            string = string + str(self.regressionGrid[path[i][1]+1 - 1][path[i][0]+1 - 1]) + ","
+            string = string + str(self.regressionGrid[path[i][1]+1 - 1][path[i][0]+1]) + ","
+            string = string + str(self.regressionGrid[path[i][1]+1 - 1][path[i][0]+1 + 1]) + ","
             # Decyzja agenta co do następnego kroku
             string = string + str(self.cords_to_rotation(path[i], path[i + 1]))
             f.write(string + "\n")
@@ -278,7 +278,7 @@ class Simulation(object):
     def getDataFromFile(self):
         possibilities = []
         decisions = []
-        with open("../Data/vowpal-data.txt") as data:
+        with open("../Data/logistic-input.txt") as data:
             for line in data:
                     decision = line.split(',')[-1].strip()
                     decisions.append(decision)
