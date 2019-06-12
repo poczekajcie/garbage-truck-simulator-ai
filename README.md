@@ -1,3 +1,4 @@
+
 # Symulator Śmieciarki
 Projekt na przedmiot **Sztuczna Inteligencja**
 
@@ -7,5 +8,3 @@ Projekt na przedmiot **Sztuczna Inteligencja**
   - Michał Romaszkin
   - Jakub Kwiatkowski
   - Aleksander Chandrykowski
-  
-  2019&reg; All rights reserved
